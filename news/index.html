@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #e4dede;
+    }
+    #news-container {
+      width: 100%;
+      margin: 20px auto;
+      background-color: #fff;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .news-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* Two columns with equal width */
+  grid-gap: 20px; /* Gap between grid items */
+}
+
+    .article {
+      margin-bottom: 20px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      background-color: #fff;
+    }
+
+    .article img {
+      max-width: 100%;
+      height: auto;
+      margin-bottom: 10px;
+      border-radius: 20px;
+    }
+
+    .article strong {
+      color: #333;
+      font-size: 1.2em;
+    }
+
+    .article-description {
+      color: #555;
+    }
+
+    .read-more {
+      display: inline-block;
+      padding: 5px 10px;
+      color: #007bff;
+      text-decoration: none;
+      border: 1px solid #007bff;
+      border-radius: 3px;
+      transition: background-color 0.3s ease;
+    }
+
+    .read-more:hover {
+      background-color: #007bff;
+      color: #fff;
+    }
+    .related {
+      width: 80%;
+    }
+    /* Media query for smaller screens */
+@media screen and (max-width: 768px) {
+  .news-container {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Adjust grid for smaller screens */
+  }
+}
+
+/* Media query for even smaller screens */
+@media screen and (max-width: 480px) {
+  .news-container {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Further adjust grid for very small screens */
+  }
+}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="news-container" id="news-container"></div>
+    <div class="news-container" id="news-container"></div>
+  </div>
+  <script>
+    const apiKey = 'fcf98713b77245dca850bc7ea1e217df';
+    const apiUrl = 'https://newsapi.org/v2/top-headlines';
+
+    function getNews() {
+      const params = {
+        country: 'us',
+        apiKey: apiKey,
+      }
+      const newsContainer = document.getElementById('news-container');
+
+        // Now you can use the modified params object to make the API request
+        const url = new URL(apiUrl);
+        url.search = new URLSearchParams(params).toString();
+
+        fetch(url, { headers: { 'X-Api-Key': apiKey } })  // Include the API key in the headers
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(newsData => {
+                const articles = newsData.articles || [];
+                articles.forEach(article => {
+                    const title = article.title || 'N/A';
+                    const description = article.description || 'N/A';
+                    const imageUrl = article.urlToImage || 'placeholder-image.jpg';
+                    const articleUrl = article.url || '#';
+
+                    const articleDiv = document.createElement('div');
+                    articleDiv.className = 'article';
+                    articleDiv.innerHTML = `
+                        <img src="${imageUrl}" alt="${title}">
+                        <strong>${title}</strong><br>
+                        <p class="article-description">${description}</p>
+                        <a class="read-more" href="${articleUrl}" target="_blank">Read more</a>
+                    `;
+
+                    newsContainer.appendChild(articleDiv);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching news:', error.message);
+            });
+    }
+
+    // Call the getNews function to fetch news when the page loads
+    window.onload = getNews;
+  </script>
+</body>
+</html>
+
